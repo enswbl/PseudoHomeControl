@@ -1,102 +1,210 @@
-import { useEffect, useReducer, useState } from "react";
+import { useEffect, useReducer } from "react";
 import "./App.css";
-import reducer from "./reducer.js";
+import { reducer, initialState } from "./reducer.js";
+import { data } from "./data.json";
 
 export default function App() {
-  const [state, disptach] = useReducer(reducer, false);
+  const [state, dispatch] = useReducer(reducer, initialState);
 
-  const [alarmStateInAllRooms, setAlarmStateInAllRooms] = useState(false);
-  const [alarmStateInLounge, setAlarmStateInLounge] = useState(false);
-  const [alarmStateInBedroom, setAlarmStateInBedroom] = useState(false);
-  const [alarmStateInKitchen, setAlarmStateInKitchen] = useState(false);
+  function fetchData() {
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        resolve(data);
+      }, 1000);
+    });
+  }
 
-  const [electricityStateInAllRooms, setElectricityStateInAllRooms] =
-    useState(false);
-  const [electricityStateInLounge, setElectricityStateInLounge] =
-    useState(false);
-  const [electricityStateInBedroom, setElectricityStateInBedroom] =
-    useState(false);
-  const [electricityStateInKitchen, setElectricityStateInKitchen] =
-    useState(false);
+  useEffect(() => {
+    const updateData = async () => {
+      try {
+        const toggleData = await fetchData();
+        console.log(toggleData[0].lounge);
+        dispatch({
+          type: "alarmLounge",
+          alarmStateInLounge: toggleData[0].lounge,
+        });
+        dispatch({
+          type: "alarmKitchen",
+          alarmStateInKitchen: toggleData[0].kitchen,
+        });
+        dispatch({
+          type: "alarmBedroom",
+          alarmStateInBedroom: toggleData[0].bedroom,
+        });
+
+        dispatch({
+          type: "electricityLounge",
+          electricityStateInLounge: toggleData[0].lounge,
+        });
+        dispatch({
+          type: "electricityKitchen",
+          electricityStateInKitchen: toggleData[0].kitchen,
+        });
+        dispatch({
+          type: "electricityBedroom",
+          electricityStateInBedroom: toggleData[0].bedroom,
+        });
+      } catch (error) {
+        console.error("Ошибка:", error);
+      }
+    };
+    updateData();
+  }, []);
 
   const toggleAlarmSystemSwitches = () => {
-    if (alarmStateInLounge && alarmStateInBedroom && alarmStateInKitchen) {
-      setAlarmStateInAllRooms(false);
-
-      setAlarmStateInLounge(false);
-      setAlarmStateInBedroom(false);
-      setAlarmStateInKitchen(false);
-    } else if (
-      (alarmStateInAllRooms &&
-        alarmStateInLounge &&
-        alarmStateInBedroom &&
-        alarmStateInKitchen) === false
+    if (
+      state.alarmStateInLounge &&
+      state.alarmStateInBedroom &&
+      state.alarmStateInKitchen
     ) {
-      setAlarmStateInAllRooms(true);
+      dispatch({
+        type: "alarmAllRooms",
+        alarmStateInAllRooms: false,
+      });
 
-      setAlarmStateInLounge(true);
-      setAlarmStateInBedroom(true);
-      setAlarmStateInKitchen(true);
+      dispatch({
+        type: "alarmLounge",
+        alarmStateInLounge: false,
+      });
+
+      dispatch({
+        type: "alarmKitchen",
+        alarmStateInKitchen: false,
+      });
+
+      dispatch({
+        type: "alarmBedroom",
+        alarmStateInBedroom: false,
+      });
+    } else if (
+      (state.alarmStateInAllRooms &&
+        state.alarmStateInLounge &&
+        state.alarmStateInBedroom &&
+        state.alarmStateInKitchen) === false
+    ) {
+      dispatch({
+        type: "alarmAllRooms",
+        alarmStateInAllRooms: true,
+      });
+
+      dispatch({
+        type: "alarmLounge",
+        alarmStateInLounge: true,
+      });
+
+      dispatch({
+        type: "alarmKitchen",
+        alarmStateInKitchen: true,
+      });
+
+      dispatch({
+        type: "alarmBedroom",
+        alarmStateInBedroom: true,
+      });
     }
   };
 
   const toggleElectricitySwitches = () => {
     if (
-      electricityStateInLounge &&
-      electricityStateInBedroom &&
-      electricityStateInKitchen
+      state.electricityStateInLounge &&
+      state.electricityStateInKitchen &&
+      state.electricityStateInBedroom
     ) {
-      setElectricityStateInAllRooms(false);
+      dispatch({
+        type: "electricityAllRooms",
+        electricityStateInAllRooms: false,
+      });
 
-      setElectricityStateInLounge(false);
-      setElectricityStateInBedroom(false);
-      setElectricityStateInKitchen(false);
+      dispatch({
+        type: "electricityLounge",
+        electricityStateInLounge: false,
+      });
+
+      dispatch({
+        type: "electricityKitchen",
+        electricityStateInKitchen: false,
+      });
+
+      dispatch({
+        type: "electricityBedroom",
+        electricityStateInBedroom: false,
+      });
     } else if (
-      (electricityStateInAllRooms &&
-        electricityStateInLounge &&
-        electricityStateInBedroom &&
-        electricityStateInKitchen) === false
+      (state.electricityStateInAllRooms &&
+        state.electricityStateInLounge &&
+        state.electricityStateInKitchen &&
+        state.electricityStateInBedroom) === false
     ) {
-      setElectricityStateInAllRooms(true);
+      dispatch({
+        type: "electricityAllRooms",
+        electricityStateInAllRooms: true,
+      });
 
-      setElectricityStateInLounge(true);
-      setElectricityStateInBedroom(true);
-      setElectricityStateInKitchen(true);
+      dispatch({
+        type: "electricityLounge",
+        electricityStateInLounge: true,
+      });
+
+      dispatch({
+        type: "electricityKitchen",
+        electricityStateInKitchen: true,
+      });
+
+      dispatch({
+        type: "electricityBedroom",
+        electricityStateInBedroom: true,
+      });
     }
   };
 
   useEffect(() => {
-    if (alarmStateInLounge && alarmStateInBedroom && alarmStateInKitchen) {
-      setAlarmStateInAllRooms(true);
+    if (
+      state.alarmStateInLounge &&
+      state.alarmStateInBedroom &&
+      state.alarmStateInKitchen
+    ) {
+      dispatch({
+        type: "alarmAllRooms",
+        alarmStateInAllRooms: true,
+      });
     } else {
-      setAlarmStateInAllRooms(false);
+      dispatch({
+        type: "alarmAllRooms",
+        alarmStateInAllRooms: false,
+      });
     }
-  }, [alarmStateInLounge, alarmStateInBedroom, alarmStateInKitchen]);
+  }, [
+    state.alarmStateInLounge,
+    state.alarmStateInBedroom,
+    state.alarmStateInKitchen,
+  ]);
 
   useEffect(() => {
     if (
-      electricityStateInLounge &&
-      electricityStateInBedroom &&
-      electricityStateInKitchen
+      state.electricityStateInLounge &&
+      state.electricityStateInBedroom &&
+      state.electricityStateInKitchen
     ) {
-      setElectricityStateInAllRooms(true);
+      dispatch({
+        type: "electricityAllRooms",
+        electricityStateInAllRooms: true,
+      });
     } else {
-      setElectricityStateInAllRooms(false);
+      dispatch({
+        type: "electricityAllRooms",
+        electricityStateInAllRooms: false,
+      });
     }
   }, [
-    electricityStateInLounge,
-    electricityStateInBedroom,
-    electricityStateInKitchen,
+    state.electricityStateInLounge,
+    state.electricityStateInBedroom,
+    state.electricityStateInKitchen,
   ]);
-
-  console.log(electricityStateInKitchen);
 
   return (
     <div className="App">
       <h1>Управление умным псевдо-домом 😼</h1>
-
       <h2>Сигнализация 🔔</h2>
-
       <div className="container">
         <div className="title">
           <b>Центральный переключатель</b>
@@ -115,38 +223,53 @@ export default function App() {
           <input
             type="checkbox"
             onChange={() => toggleAlarmSystemSwitches()}
-            checked={alarmStateInAllRooms ? true : false}
+            checked={state.alarmStateInAllRooms ? true : false}
+          />
+          <span className="slider round"></span>
+        </label>
+
+        <label className="switch">
+          <input
+            type="checkbox"
+            onChange={(e) =>
+              dispatch({
+                type: "alarmLounge",
+                alarmStateInLounge: e.target.checked,
+              })
+            }
+            checked={state.alarmStateInLounge ? true : false}
+          />
+          <span className="slider round"></span>
+        </label>
+
+        <label className="switch">
+          <input
+            type="checkbox"
+            onChange={(e) =>
+              dispatch({
+                type: "alarmKitchen",
+                alarmStateInKitchen: e.target.checked,
+              })
+            }
+            checked={state.alarmStateInKitchen ? true : false}
           />
           <span className="slider round"></span>
         </label>
         <label className="switch">
           <input
             type="checkbox"
-            onChange={() => setAlarmStateInLounge((value) => !value)}
-            checked={alarmStateInLounge ? true : false}
-          />
-          <span className="slider round"></span>
-        </label>
-        <label className="switch">
-          <input
-            type="checkbox"
-            onChange={() => setAlarmStateInKitchen((value) => !value)}
-            checked={alarmStateInKitchen ? true : false}
-          />
-          <span className="slider round"></span>
-        </label>
-        <label className="switch">
-          <input
-            type="checkbox"
-            onChange={() => setAlarmStateInBedroom((value) => !value)}
-            checked={alarmStateInBedroom ? true : false}
+            onChange={(e) =>
+              dispatch({
+                type: "alarmBedroom",
+                alarmStateInBedroom: e.target.checked,
+              })
+            }
+            checked={state.alarmStateInBedroom ? true : false}
           />
           <span className="slider round"></span>
         </label>
       </div>
-
       <h2>Электричество ⚡️</h2>
-
       <div className="container">
         <div className="title">
           <b>Центральный переключатель</b>
@@ -165,31 +288,46 @@ export default function App() {
           <input
             type="checkbox"
             onChange={() => toggleElectricitySwitches()}
-            checked={electricityStateInAllRooms ? true : false}
+            checked={state.electricityStateInAllRooms ? true : false}
           />
           <span className="slider round"></span>
         </label>
         <label className="switch">
           <input
             type="checkbox"
-            onChange={() => setElectricityStateInLounge((value) => !value)}
-            checked={electricityStateInLounge ? true : false}
+            onChange={(e) =>
+              dispatch({
+                type: "electricityLounge",
+                electricityStateInLounge: e.target.checked,
+              })
+            }
+            checked={state.electricityStateInLounge ? true : false}
           />
           <span className="slider round"></span>
         </label>
         <label className="switch">
           <input
             type="checkbox"
-            onChange={() => setElectricityStateInKitchen((value) => !value)}
-            checked={electricityStateInKitchen ? true : false}
+            onChange={(e) =>
+              dispatch({
+                type: "electricityKitchen",
+                electricityStateInKitchen: e.target.checked,
+              })
+            }
+            checked={state.electricityStateInKitchen ? true : false}
           />
           <span className="slider round"></span>
         </label>
         <label className="switch">
           <input
             type="checkbox"
-            onChange={() => setElectricityStateInBedroom((value) => !value)}
-            checked={electricityStateInBedroom ? true : false}
+            onChange={(e) =>
+              dispatch({
+                type: "electricityBedroom",
+                electricityStateInBedroom: e.target.checked,
+              })
+            }
+            checked={state.electricityStateInBedroom ? true : false}
           />
           <span className="slider round"></span>
         </label>

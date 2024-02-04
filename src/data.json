@@ -1,0 +1,16 @@
+{
+  "data": [
+    {
+      "type": "alarm_system",
+      "lounge": true,
+      "bedroom": false,
+      "kitchen": true
+    },
+    {
+      "type": "electricity",
+      "lounge": false,
+      "bedroom": false,
+      "kitchen": false
+    }
+  ]
+}
